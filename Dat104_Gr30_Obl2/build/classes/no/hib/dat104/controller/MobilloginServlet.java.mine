@@ -1,0 +1,54 @@
+package no.hib.dat104.controller;
+
+import static no.hib.dat104.controller.UrlMappings.DELTAGERLISTE_URL;
+import static no.hib.dat104.controller.UrlMappings.MOBIL_LOGIN_URL;
+import static no.hib.dat104.controller.UrlMappings.PAAMELDING_BEKREFTELSE_URL;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import no.hib.dat104.dataaccess.DeltagerEAO;
+import no.hib.dat104.model.Deltager;
+import no.hib.dat104.validering.Inputvalidering;
+
+
+@WebServlet("/" +  MOBIL_LOGIN_URL)
+public class MobilloginServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		request.getRequestDispatcher("WEB-INF/jsp/mobillogin.jsp").forward(request, response);
+		
+	}
+
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+		
+		HttpSession session = request.getSession();
+		Deltager deltager = new Deltager();
+		Inputvalidering valider = new Inputvalidering();
+		deltager.populer(request);
+		String mobil = session.getAttribute("mobil").toString();
+		deltager.setMobil(mobil);
+		
+		
+		if(valider.erMobilloginRiktig(mobil) == true){
+			session.setAttribute("deltager", deltager);
+			response.sendRedirect(DELTAGERLISTE_URL);
+		}else{
+			session.setAttribute("valider", valider);
+			response.sendRedirect(MOBIL_LOGIN_URL);
+		}
+	
+		}
+
+
+}
